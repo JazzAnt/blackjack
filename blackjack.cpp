@@ -133,6 +133,24 @@ struct Card {
   }
 };
 
+class Deck {
+  // I'm learning arrays from learncpp for this which is why I use an array
+  // even though cards would've probably been better as a vector since it's
+  // not constexpr.
+private:
+  std::array<Card, 52> cards{};
+
+public:
+  Deck() {
+    int index{0};
+    for (auto suit : Card::allSuits) {
+      for (auto rank : Card::allRanks) {
+        cards[index++] = Card{rank, suit};
+      }
+    }
+  }
+};
+
 int main() {
   // for testing
   for (auto suit : Card::allSuits) {
