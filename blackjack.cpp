@@ -1,3 +1,5 @@
+#include "Random.h"
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <iostream>
@@ -138,27 +140,38 @@ class Deck {
   // even though cards would've probably been better as a vector since it's
   // not constexpr.
 private:
-  std::array<Card, 52> cards{};
+  std::array<Card, 52> m_cards{};
+  int m_cardIndex{0};
 
 public:
   Deck() {
     int index{0};
     for (auto suit : Card::allSuits) {
       for (auto rank : Card::allRanks) {
-        cards[index++] = Card{rank, suit};
+        m_cards[index++] = Card{rank, suit};
       }
     }
+  }
+
+  Card dealCard() {
+    assert(m_cardIndex < std::ssize(m_cards));
+    return m_cards[m_cardIndex++];
+  }
+
+  void shuffle() {
+    std::shuffle(m_cards.begin(), m_cards.end(), Random::mt);
+    m_cardIndex = 0;
   }
 };
 
 int main() {
   // for testing
-  for (auto suit : Card::allSuits) {
-    for (auto rank : Card::allRanks) {
+  Deck deck{};
+  std::cout << deck.dealCard() << ' ' << deck.dealCard() << ' '
+            << deck.dealCard() << '\n';
 
-      std::cout << Card{rank, suit} << ' ';
-    }
-    std::cout << '\n';
-  }
+  deck.shuffle();
+  std::cout << deck.dealCard() << ' ' << deck.dealCard() << ' '
+            << deck.dealCard() << '\n';
   return 0;
 }
