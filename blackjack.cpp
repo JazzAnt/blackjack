@@ -244,6 +244,7 @@ void playGame() {
     char choice{inputChar()};
 
     switch (choice) {
+    case 'H':
     case 'h': {
       Card card = deck.dealCard();
       player.addCard(card);
@@ -252,6 +253,7 @@ void playGame() {
                 << "You now have: " << player.score;
       break;
     }
+    case 'S':
     case 's': {
       hitting = false;
       break;
@@ -292,7 +294,7 @@ int main() {
     playGame();
     std::cout << '\n' << "Play again? (y)es or (n)o?";
     char choice{inputChar()};
-    if (choice == 'n') {
+    if (choice == 'n' || choice == 'N') {
       break;
     }
   }
