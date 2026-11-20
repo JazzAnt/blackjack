@@ -168,6 +168,11 @@ struct Player {
   int score{};
 };
 
+namespace Settings {
+constexpr int bustLimit{21};
+constexpr int dealerLimit{17};
+} // namespace Settings
+
 void playGame() {
   Player dealer{0};
   Player player{0};
@@ -181,10 +186,25 @@ void playGame() {
   std::cout << '\n' << "Player has: " << player.score;
   std::cout << '\n';
 
-  if (player.score > dealer.score) {
-    std::cout << "You Win!";
+  // Dealer Turn
+  while (dealer.score < Settings::dealerLimit &&
+         !(player.score > Settings::bustLimit)) { // skip if player busted
+    Card card = deck.dealCard();
+    dealer.score += card.getValue();
+    std::cout << '\n'
+              << "The dealer flips a " << card << ". "
+              << "They now have: " << dealer.score;
+  }
+
+  // Scoring
+  if (player.score > Settings::bustLimit) {
+    std::cout << '\n' << "The player went bust!" << '\n' << "You lose!";
+  } else if (dealer.score > Settings::bustLimit) {
+    std::cout << '\n' << "The dealer went bust!" << '\n' << "You win!";
+  } else if (player.score > dealer.score) {
+    std::cout << '\n' << "You win!";
   } else {
-    std::cout << "You Lose!";
+    std::cout << '\n' << "You lose!";
   }
 }
 
