@@ -2,8 +2,11 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <cstdlib>
+#include <ios>
 #include <iostream>
 #include <iterator>
+#include <limits>
 
 namespace Settings {
 constexpr int bustLimit{21};
@@ -189,6 +192,29 @@ struct Player {
   }
 };
 
+// gets a char from the user and handles buffer cleanup and extraction fails
+char inputChar() {
+  while (true) {
+
+    char input{};
+    std::cin >> input;
+
+    if (!std::cin) {
+      if (std::cin.eof()) {
+        std::exit(0);
+      }
+
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      continue;
+    }
+
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    return input;
+  }
+}
+
 void playGame() {
   Player dealer{0};
   Player player{0};
@@ -214,11 +240,8 @@ void playGame() {
 
   bool hitting{true};
   while (hitting && !(player.score > Settings::bustLimit)) {
-    char choice{};
     std::cout << '\n' << "(h) to hit, or (s) to stand: ";
-    std::cin >> choice;
-
-    // TODO: cleanup and validate cin
+    char choice{inputChar()};
 
     switch (choice) {
     case 'h': {
@@ -265,6 +288,14 @@ void playGame() {
 }
 
 int main() {
-  playGame();
+  while (true) {
+    playGame();
+    std::cout << '\n' << "Play again? (y)es or (n)o?";
+    char choice{inputChar()};
+    if (choice == 'n') {
+      break;
+    }
+  }
+  std::cout << '\n' << "Thank you for playing my game!";
   return 0;
 }
