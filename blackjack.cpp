@@ -4,6 +4,12 @@
 #include <cassert>
 #include <iostream>
 #include <iterator>
+
+namespace Settings {
+constexpr int bustLimit{21};
+constexpr int dealerLimit{17};
+} // namespace Settings
+
 struct Card {
   enum Rank {
     r_ace,
@@ -62,6 +68,8 @@ struct Card {
       return 0;
     }
   }
+
+  bool isAce() { return rank == r_ace; }
 
   // friend keyword puts this definition outside of the struct definition,
   // which is needed for operator overloads
@@ -166,12 +174,20 @@ public:
 
 struct Player {
   int score{};
-};
+  int aces{0};
 
-namespace Settings {
-constexpr int bustLimit{21};
-constexpr int dealerLimit{17};
-} // namespace Settings
+  void addCard(Card card) {
+    score += card.getValue();
+    if (card.isAce()) {
+      ++aces;
+    }
+    // If bust, treat ace as 1 instead of 11
+    while (score > Settings::bustLimit && aces > 0) {
+      score -= 10;
+      --aces;
+    }
+  }
+};
 
 void playGame() {
   Player dealer{0};
@@ -179,11 +195,22 @@ void playGame() {
   Deck deck{};
 
   deck.shuffle();
-  dealer.score += deck.dealCard().getValue();
-  player.score += deck.dealCard().getValue() + deck.dealCard().getValue();
+  std::cout << '\n' << "The deck is shuffled";
 
-  std::cout << '\n' << "Dealer has: " << dealer.score;
-  std::cout << '\n' << "Player has: " << player.score;
+  Card dealerCard1st = deck.dealCard();
+  dealer.addCard(dealerCard1st);
+
+  Card playerCard1st = deck.dealCard();
+  player.addCard(playerCard1st);
+  Card playerCard2nd = deck.dealCard();
+  player.addCard(playerCard2nd);
+
+  std::cout << '\n'
+            << "Dealer is showing: " << dealerCard1st << " (" << dealer.score
+            << ')';
+  std::cout << '\n'
+            << "You is showing: " << playerCard1st << ' ' << playerCard2nd
+            << " (" << player.score << ')';
 
   bool hitting{true};
   while (hitting && !(player.score > Settings::bustLimit)) {
@@ -196,7 +223,7 @@ void playGame() {
     switch (choice) {
     case 'h': {
       Card card = deck.dealCard();
-      player.score += card.getValue();
+      player.addCard(card);
       std::cout << '\n'
                 << "You were dealt " << card << ". "
                 << "You now have: " << player.score;
@@ -217,7 +244,7 @@ void playGame() {
   while (dealer.score < Settings::dealerLimit &&
          !(player.score > Settings::bustLimit)) { // skip if player busted
     Card card = deck.dealCard();
-    dealer.score += card.getValue();
+    dealer.addCard(card);
     std::cout << '\n'
               << "The dealer flips a " << card << ". "
               << "They now have: " << dealer.score;
