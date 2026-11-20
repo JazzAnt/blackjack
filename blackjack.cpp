@@ -184,7 +184,34 @@ void playGame() {
 
   std::cout << '\n' << "Dealer has: " << dealer.score;
   std::cout << '\n' << "Player has: " << player.score;
-  std::cout << '\n';
+
+  bool hitting{true};
+  while (hitting && !(player.score > Settings::bustLimit)) {
+    char choice{};
+    std::cout << '\n' << "(h) to hit, or (s) to stand: ";
+    std::cin >> choice;
+
+    // TODO: cleanup and validate cin
+
+    switch (choice) {
+    case 'h': {
+      Card card = deck.dealCard();
+      player.score += card.getValue();
+      std::cout << '\n'
+                << "You were dealt " << card << ". "
+                << "You now have: " << player.score;
+      break;
+    }
+    case 's': {
+      hitting = false;
+      break;
+    }
+    default: {
+      std::cout << '\n' << "invalid choice";
+      break;
+    }
+    }
+  }
 
   // Dealer Turn
   while (dealer.score < Settings::dealerLimit &&
@@ -203,13 +230,14 @@ void playGame() {
     std::cout << '\n' << "The dealer went bust!" << '\n' << "You win!";
   } else if (player.score > dealer.score) {
     std::cout << '\n' << "You win!";
-  } else {
+  } else if (dealer.score > player.score) {
     std::cout << '\n' << "You lose!";
+  } else {
+    std::cout << '\n' << "It's a draw!";
   }
 }
 
 int main() {
-  // for testing
   playGame();
   return 0;
 }
