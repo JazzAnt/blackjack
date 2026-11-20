@@ -164,14 +164,32 @@ public:
   }
 };
 
-int main() {
-  // for testing
+struct Player {
+  int score{};
+};
+
+void playGame() {
+  Player dealer{0};
+  Player player{0};
   Deck deck{};
-  std::cout << deck.dealCard() << ' ' << deck.dealCard() << ' '
-            << deck.dealCard() << '\n';
 
   deck.shuffle();
-  std::cout << deck.dealCard() << ' ' << deck.dealCard() << ' '
-            << deck.dealCard() << '\n';
+  dealer.score += deck.dealCard().getValue();
+  player.score += deck.dealCard().getValue() + deck.dealCard().getValue();
+
+  std::cout << '\n' << "Dealer has: " << dealer.score;
+  std::cout << '\n' << "Player has: " << player.score;
+  std::cout << '\n';
+
+  if (player.score > dealer.score) {
+    std::cout << "You Win!";
+  } else {
+    std::cout << "You Lose!";
+  }
+}
+
+int main() {
+  // for testing
+  playGame();
   return 0;
 }
